@@ -835,3 +835,13 @@ p {
     text-align: center;
   }
 }
+
+/* Additional Styles */
+.btn-primary .quantity-btn,
+.btn-primary .delete-btn {
+  @apply px-4 py-2 transition-colors duration-300;
+}
+
+.btn-primary .quantity {
+  @apply text-xl font-bold;
+}
