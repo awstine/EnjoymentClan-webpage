@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>EnjoymentClan | Cart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Fonts and Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#FF5E14',
+            secondary: '#1A1A1A',
+            accent: '#FF9E00',
+            dark: '#121212',
+            light: '#FFFFFF',
+            gray: '#F5F5F5',
+            text: '#333333',
+            textLight: '#777777',
+          },
+          fontFamily: {
+            poppins: ['Poppins', 'sans-serif'],
+          },
+          boxShadow: {
+            sm: '0 2px 8px rgba(0,0,0,0.1)',
+            md: '0 4px 12px rgba(0,0,0,0.15)',
+            lg: '0 8px 24px rgba(0,0,0,0.2)',
+          },
+          borderRadius: {
+            custom: '8px',
+          },
+        }
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer components {
+      .btn {
+        @apply inline-block px-7 py-3 rounded-custom font-semibold uppercase tracking-wider text-sm transition-all duration-300 ease-in-out cursor-pointer text-center border-2 border-transparent;
+      }
+      .btn-primary {
+        @apply bg-primary text-light hover:bg-[#E04E00] hover:-translate-y-1 hover:shadow-md;
+      }
+      .btn-outline {
+        @apply bg-transparent text-primary border-primary hover:bg-primary hover:text-light hover:-translate-y-1 hover:shadow-md;
+      }
+      .btn-small {
+        @apply px-4 py-2 text-xs;
+      }
+      .section-title {
+        @apply relative inline-block mb-8 text-4xl font-bold;
+      }
+      .section-title:after {
+        @apply content-[''] absolute -bottom-2 left-0 w-16 h-1 bg-primary;
+      }
+      .section-subtitle {
+        @apply block text-sm uppercase tracking-widest text-primary mb-4 font-semibold;
+      }
+      .cart-table th, .cart-table td { 
+        @apply vertical-align-middle;
+      }
+      .cart-table th { 
+        @apply bg-gray;
+      }
+      .cart-table tr:last-child td { 
+        @apply border-b-0;
+      }
+      .cart-table img { 
+        @apply shadow-sm;
+      }
+      .qty-btn { 
+        @apply transition-colors duration-200;
+      }
+      .qty-btn:hover { 
+        @apply bg-gray-100;
+      }
+      .remove-btn:hover { 
+        @apply text-primary;
+      }
+    }
+  </style>
+</head>
+<body class="font-poppins text-text bg-light min-h-screen">
+
+  <!-- HEADER / TOP NAV -->
+  <header class="fixed top-0 left-0 w-full py-5 bg-dark z-50 shadow-md">
+    <div class="container mx-auto px-5 max-w-6xl">
+      <div class="flex justify-between items-center">
+        <div class="brand">
+          <a href="sample.html">
+            <img src="pics/white.png" alt="EnjoymentClan Logo" class="h-20">
+          </a>
+        </div>
+        <nav class="main-nav hidden md:block">
+          <ul class="flex items-center space-x-8">
+            <li><a href="tail.html#home" class="nav-link text-light font-medium relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full">HOME</a></li>
+            <li><a href="tail.html#about" class="nav-link text-light font-medium relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full">ABOUT US</a></li>
+            <li><a href="merchandise.html" class="nav-link text-light font-medium relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-full after:h-0.5 after:bg-primary text-primary">MERCHANDISE</a></li>
+            <li><a href="tail.html#join" class="nav-link text-light font-medium relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full">CONTACT US</a></li>
+          </ul>
+        </nav>
+        <div class="mobile-menu-toggle md:hidden text-light text-2xl cursor-pointer">
+          <i class="fas fa-bars"></i>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CART HERO SECTION -->
+  <section class="cart-hero pt-32 pb-10 bg-gradient-to-b from-primary/90 to-light text-dark text-center">
+    <div class="container mx-auto px-5 max-w-6xl">
+      <h1 class="text-4xl md:text-6xl font-bold mb-4 uppercase tracking-wider">Your Shopping Cart</h1>
+      <h2 class="text-xl md:text-2xl font-light tracking-wider mb-2">Review your items before checkout</h2>
+    </div>
+  </section>
+
+  <!-- CART CONTENT -->
+  <main class="container mx-auto px-5 max-w-6xl mt-28 mb-16">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-10 gap-4">
+      <h1 class="text-4xl font-bold text-dark">Your Cart</h1>
+      <a href="merchandise.html" class="text-primary font-semibold underline hover:text-dark transition text-lg">Continue shopping</a>
+    </div>
+    <div id="cartContent"></div>
+  </main>
+
+  <!-- NEWSLETTER SECTION -->
+  <section class="py-20 bg-primary text-light">
+    <div class="container mx-auto px-5 max-w-4xl text-center">
+      <h2 class="text-3xl font-bold mb-4">Stay Updated</h2>
+      <p class="mb-8 text-lg">Subscribe for exclusive merch drops and special offers.</p>
+      <form class="newsletter-form flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+        <input type="email" placeholder="Your Email Address" required class="flex-1 px-4 py-3 rounded-custom border-0 focus:outline-none focus:ring-2 focus:ring-dark text-dark">
+        <button type="submit" class="btn bg-dark text-light hover:bg-secondary">Subscribe</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-dark text-light pt-16 pb-8">
+    <div class="container mx-auto px-5 max-w-6xl">
+      <div class="footer-content flex flex-col md:flex-row justify-between items-center mb-8">
+        <div class="footer-logo mb-6 md:mb-0">
+            <img src="pics/white.png" alt="EnjoymentClan Logo" class="h-32">
+        </div>
+        <div class="social-links flex gap-6">
+          <a href="#" aria-label="Facebook" class="text-2xl hover:text-primary transition-colors duration-300"><i class="fab fa-facebook"></i></a>
+          <a href="#" aria-label="Instagram" class="text-2xl hover:text-primary transition-colors duration-300"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="Twitter" class="text-2xl hover:text-primary transition-colors duration-300"><i class="fab fa-twitter"></i></a>
+        </div>
+      </div>
+      <p class="copyright text-center text-textLight text-sm">&copy; 2025 EnjoymentClan. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Cart management functions
+    function getCart() {
+      return JSON.parse(localStorage.getItem('enjoymentCart') || '[]');
+    }
+    
+    function setCart(cart) {
+      localStorage.setItem('enjoymentCart', JSON.stringify(cart));
+    }
+    
+    function renderCart() {
+      const cart = getCart();
+      const cartContent = document.getElementById('cartContent');
+      
+      if (!cart.length) {
+        cartContent.innerHTML = `
+          <div class="bg-white rounded-custom shadow-lg p-12 text-center">
+            <i class="fas fa-shopping-cart text-5xl text-primary mb-4"></i>
+            <h3 class="text-2xl font-bold text-dark mb-2">Your cart is empty</h3>
+            <p class="text-textLight text-lg mb-6">Looks like you haven't added any items yet.</p>
+            <a href="merchandise.html" class="btn btn-primary px-8 py-3">Browse Merchandise</a>
+          </div>
+        `;
+        return;
+      }
+      
+      let subtotal = 0;
+      let shipping = 150; // Fixed shipping cost
+      
+      cartContent.innerHTML = `
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- Cart Items -->
+          <div class="lg:col-span-2 flex flex-col gap-6">
+            ${cart.map((item, idx) => {
+              const itemTotal = item.qty * parseInt(item.price);
+              subtotal += itemTotal;
+              return `
+                <div class="flex flex-col md:flex-row items-center bg-white rounded-custom shadow p-6 gap-6">
+                  <img src="${item.img}" alt="${item.name}" class="w-40 h-40 object-cover rounded-custom border border-gray-200 shadow-md flex-shrink-0">
+                  <div class="flex-1 flex flex-col gap-2 w-full">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between w-full">
+                      <div>
+                        <div class="font-semibold text-xl text-dark">${item.name}</div>
+                        <div class="text-primary font-bold text-lg mt-1">KSH ${parseInt(item.price).toLocaleString()}</div>
+                      </div>
+                      <div class="flex items-center gap-2 mt-4 md:mt-0">
+                        <button class="qty-btn bg-gray-200 text-dark rounded px-3 py-2 text-lg font-bold hover:bg-primary hover:text-light transition" onclick="updateQty(${idx}, -1)">&#8722;</button>
+                        <span class="px-4 text-lg font-semibold">${item.qty}</span>
+                        <button class="qty-btn bg-primary text-light rounded px-3 py-2 text-lg font-bold hover:bg-dark hover:text-light transition" onclick="updateQty(${idx}, 1)">&#43;</button>
+                      </div>
+                    </div>
+                    <div class="flex items-center justify-between mt-2">
+                      <button class="remove-btn flex items-center gap-2 text-primary hover:text-red-600 font-semibold text-base" onclick="removeItem(${idx})">
+                        <i class="fas fa-trash"></i> Remove
+                      </button>
+                      <div class="font-bold text-lg text-dark">Total: KSH ${itemTotal.toLocaleString()}</div>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+          <!-- Order Summary -->
+          <div class="lg:col-span-1">
+            <div class="bg-white rounded-custom shadow-lg p-8 sticky top-8">
+              <h3 class="text-xl font-bold mb-6 pb-2 border-b border-gray-200">CART SUMMARY</h3>
+              <div class="flex justify-between mb-3">
+                <span class="text-textLight">Subtotal</span>
+                <span class="font-semibold">KSH ${subtotal.toLocaleString()}</span>
+              </div>
+              <div class="flex justify-between mb-3">
+                <span class="text-textLight">Shipping</span>
+                <span class="font-semibold">KSH ${shipping.toLocaleString()}</span>
+              </div>
+              <div class="flex justify-between border-t border-gray-200 pt-4 mb-6">
+                <span class="text-lg font-bold">Total</span>
+                <span class="text-xl font-bold text-primary">KSH ${(subtotal + shipping).toLocaleString()}</span>
+              </div>
+              <button class="btn btn-primary w-full py-3 rounded-custom font-bold text-lg mt-2" onclick="checkout()">
+                Checkout (KSH ${(subtotal + shipping).toLocaleString()})
+              </button>
+              <div class="mt-6 bg-gray-50 rounded p-4 text-center text-sm text-textLight">
+                <i class="fas fa-undo mr-2"></i>Returns are easy<br>
+                Free return within 7 days <a href="#" class="underline">Details</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    function updateQty(idx, delta) {
+      let cart = getCart();
+      cart[idx].qty += delta;
+      if (cart[idx].qty < 1) cart[idx].qty = 1;
+      setCart(cart);
+      renderCart();
+    }
+    
+    function removeItem(idx) {
+      let cart = getCart();
+      cart.splice(idx, 1);
+      setCart(cart);
+      renderCart();
+    }
+    
+    function checkout() {
+      // In a real implementation, this would redirect to checkout
+      alert('Proceeding to checkout!');
+    }
+    
+    // Initialize cart on page load
+    renderCart();
+  </script>
+</body>
+</html>
