@@ -102,6 +102,14 @@
     </div>
   </div>
 
+  <!-- Add this notification div after the header -->
+  <div id="notification" class="fixed top-24 right-4 bg-white rounded-lg shadow-lg p-4 transform translate-x-full transition-transform duration-300 z-50 w-96">
+    <div class="flex items-center gap-3">
+      <i class="fas fa-check-circle text-primary text-xl"></i>
+      <p class="text-dark font-medium whitespace-nowrap overflow-hidden text-ellipsis">Item added to cart!</p>
+    </div>
+  </div>
+
   <!-- MERCH HERO SECTION -->
   <section class="merch-hero pt-32 pb-10 bg-gradient-to-b from-primary/90 to-light text-dark text-center">
     <div class="container mx-auto px-5 max-w-6xl">
@@ -123,9 +131,12 @@
             <button type="submit" class="text-primary text-xl px-2 hover:text-dark"><i class="fas fa-search"></i></button>
           </form>
           <!-- Cart Button -->
-          <button id="cartBtn" class="relative text-dark text-2xl hover:text-primary transition-colors duration-300">
-            <i class="fas fa-shopping-cart"></i>
-            <span id="cartCount" class="absolute -top-2 -right-2 bg-primary text-light text-xs rounded-full px-2 py-0.5 font-bold">0</span>
+          <button id="cartBtn" class="relative flex items-center gap-2 text-dark text-2xl hover:text-primary transition-colors duration-300">
+            <span class="relative">
+              <i class="fas fa-shopping-cart"></i>
+              <span id="cartCount" class="absolute -top-2 -right-2 bg-primary text-light text-xs rounded-full px-2 py-0.5 font-bold">0</span>
+            </span>
+            <span class="text-base font-semibold">Cart</span>
           </button>
         </div>
       </div>
@@ -251,14 +262,6 @@
 
   <!-- Add this script before </body> -->
   <script>
-    // Simple cart modal logic
-    const cartBtn = document.getElementById('cartBtn');
-    const cartModal = document.getElementById('cartModal');
-    const closeCart = document.getElementById('closeCart');
-    cartBtn.addEventListener('click', () => cartModal.classList.remove('hidden'));
-    closeCart.addEventListener('click', () => cartModal.classList.add('hidden'));
-    cartModal.addEventListener('click', (e) => { if (e.target === cartModal) cartModal.classList.add('hidden'); });
-
     // Search logic (basic, just for demo)
     document.getElementById('searchForm').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -289,34 +292,117 @@
       const cart = getCart();
       document.getElementById('cartCount').textContent = cart.reduce((sum, item) => sum + item.qty, 0);
     }
+
+    // Helper to render quantity controls
+    function renderQuantityControls(btn, name, qty) {
+      btn.innerHTML = `
+        <div class="flex items-center justify-between w-full px-2">
+          <button class="quantity-btn" data-action="decrease" data-name="${name}">-</button>
+          <span class="quantity">${qty}</span>
+          <button class="quantity-btn" data-action="increase" data-name="${name}">+</button>
+          <button class="delete-btn" data-action="delete" data-name="${name}">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      `;
+      btn.classList.remove('hover:bg-[#E04E00]', 'hover:-translate-y-1');
+      btn.querySelectorAll('.quantity-btn, .delete-btn').forEach(qtyBtn => {
+        qtyBtn.classList.add('text-light', 'hover:text-light/80', 'font-bold', 'text-xl');
+      });
+    }
+
     // Add to Cart buttons
     document.querySelectorAll('.product').forEach(productEl => {
       const btn = productEl.querySelector('.btn-primary');
-      btn.addEventListener('click', () => {
-        const name = productEl.querySelector('h3').textContent.trim();
+      const name = productEl.querySelector('h3').textContent.trim();
+
+      // On page load, if item is in cart, show quantity controls
+      let cart = getCart();
+      let found = cart.find(item => item.name === name);
+      if (found) {
+        renderQuantityControls(btn, name, found.qty);
+      }
+
+      btn.addEventListener('click', function(e) {
+        // Prevent double handling for quantity/delete buttons
+        if (e.target.closest('.quantity-btn') || e.target.closest('.delete-btn')) return;
+
         const price = productEl.querySelector('.price').textContent.replace(/[^\d]/g, '');
         const img = productEl.querySelector('img').src;
-        // You can add more fields like size if needed
         let cart = getCart();
         let found = cart.find(item => item.name === name);
-        if (found) {
-          found.qty += 1;
-        } else {
+
+        if (!found) {
           cart.push({ name, price, img, qty: 1 });
+          setCart(cart);
+          updateCartCount();
+          showNotification();
+          renderQuantityControls(btn, name, 1);
+        }
+      });
+    });
+
+    // Notification
+    function showNotification(message = "Item added to cart!") {
+      const notification = document.getElementById('notification');
+      notification.querySelector('p').textContent = message;
+      notification.classList.remove('translate-x-full');
+      setTimeout(() => {
+        notification.classList.add('translate-x-full');
+      }, 2000);
+    }
+
+    // Handle quantity and delete actions (event delegation)
+    document.addEventListener('click', function(e) {
+      const qtyBtn = e.target.closest('.quantity-btn');
+      const delBtn = e.target.closest('.delete-btn');
+      if (qtyBtn) {
+        const name = qtyBtn.getAttribute('data-name');
+        const action = qtyBtn.getAttribute('data-action');
+        let cart = getCart();
+        let item = cart.find(i => i.name === name);
+        if (!item) return;
+        if (action === 'increase') {
+          item.qty += 1;
+        } else if (action === 'decrease') {
+          item.qty = Math.max(1, item.qty - 1);
         }
         setCart(cart);
         updateCartCount();
-      });
-    });
-    // Cart icon click
-    document.getElementById('cartBtn').addEventListener('click', () => {
-      const cart = getCart();
-      if (cart.length > 0) {
-        window.location.href = 'cart.html';
-      } else {
-        document.getElementById('cartModal').classList.remove('hidden');
+        // Update the number in the button
+        const btn = findProductButtonByName(name);
+        if (btn) renderQuantityControls(btn, name, item.qty);
+      }
+      if (delBtn) {
+        const name = delBtn.getAttribute('data-name');
+        let cart = getCart();
+        cart = cart.filter(i => i.name !== name);
+        setCart(cart);
+        updateCartCount();
+        // Revert button to "Add to Cart"
+        const btn = findProductButtonByName(name);
+        if (btn) btn.textContent = 'Add to Cart';
+        showNotification("Item removed from cart!");
       }
     });
+
+    // Helper to find the button for a product by name
+    function findProductButtonByName(name) {
+      const products = document.querySelectorAll('.product');
+      for (let product of products) {
+        const h3 = product.querySelector('h3');
+        if (h3 && h3.textContent.trim() === name) {
+          return product.querySelector('.btn-primary');
+        }
+      }
+      return null;
+    }
+
+    // Cart icon click
+    document.getElementById('cartBtn').addEventListener('click', () => {
+      window.location.href = 'cart.html';
+    });
+
     // Update count on load
     updateCartCount();
   </script>
